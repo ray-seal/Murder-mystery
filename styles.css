@@ -3,7 +3,7 @@
   --paper-dark: #e9d9a0;
   --accent: #b30000; /* blood red */
   --muted: #6b5a3c;
-  --card: rgba(255,255,255,0.85);
+  --card: rgba(255,255,255,0.95);
   --shadow: 0 6px 18px rgba(0,0,0,0.12);
   --max-width: 1100px;
   --radius: 8px;
@@ -89,7 +89,7 @@ body{
   transform:translateZ(0);
   transition:transform .12s ease;
   margin-bottom:12px;
-  z-index:1; /* keep drips behind modal (modal z-index increased below) */
+  z-index:1;
 }
 
 /* dripping blood effect */
@@ -188,7 +188,7 @@ body{
 
 .clue{
   padding:10px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.75));
+  background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
   border-radius:6px;
   border-left:4px solid rgba(0,0,0,0.06);
   font-size:14px;
@@ -249,7 +249,7 @@ body{
   border-radius:8px;
   text-align:center;
   box-shadow:0 18px 60px rgba(0,0,0,0.4);
-  pointer-events:auto; /* ensure it accepts touches */
+  pointer-events:auto;
   -webkit-overflow-scrolling: touch;
 }
 
