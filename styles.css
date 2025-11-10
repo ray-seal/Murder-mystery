@@ -89,6 +89,7 @@ body{
   transform:translateZ(0);
   transition:transform .12s ease;
   margin-bottom:12px;
+  z-index:1; /* keep drips behind modal (modal z-index increased below) */
 }
 
 /* dripping blood effect */
@@ -107,6 +108,7 @@ body{
   border-bottom-right-radius:12px;
   box-shadow:0 6px 10px rgba(0,0,0,0.18);
   transform:skewX(-6deg);
+  z-index:0;
 }
 
 /* drips */
@@ -120,6 +122,7 @@ body{
   background:linear-gradient(180deg,#7b0000,#450000);
   border-radius:0 0 6px 6px;
   box-shadow:0 6px 10px rgba(0,0,0,0.2);
+  z-index:0;
 }
 
 /* hover */
@@ -234,7 +237,8 @@ body{
   align-items:center;
   justify-content:center;
   background:rgba(0,0,0,0.45);
-  z-index:50;
+  z-index:9999; /* raised to be above everything */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .modal-content{
@@ -245,7 +249,15 @@ body{
   border-radius:8px;
   text-align:center;
   box-shadow:0 18px 60px rgba(0,0,0,0.4);
+  pointer-events:auto; /* ensure it accepts touches */
+  -webkit-overflow-scrolling: touch;
 }
 
 #result-title{ color:var(--accent); margin:0 0 8px 0; font-family:"Special Elite", monospace; font-size:28px; }
 #result-text{ color:#333; line-height:1.5; }
+
+/* make the close button more clickable on touch devices */
+#close-result {
+  -webkit-tap-highlight-color: rgba(0,0,0,0.08);
+  touch-action: manipulation;
+}
