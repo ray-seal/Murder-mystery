@@ -64,12 +64,12 @@
     </footer>
   </div>
 
-  <!-- Result modal; start hidden and explicitly aria-hidden -->
-  <div id="result-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
+  <!-- Result modal; start hidden and explicitly aria-hidden; also inline-hidden as a last-resort fallback so it can't appear before CSS or JS loads -->
+  <div id="result-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true" style="display:none;">
     <div class="modal-content" role="document">
       <h2 id="result-title"></h2>
       <p id="result-text"></p>
-      <button id="close-result" type="button" class="small-btn" aria-label="Close result dialog">Close</button>
+      <button id="close-result" type="button" class="small-btn" aria-label="Close result dialog" onclick="(function(){var m=document.getElementById('result-modal'); if(m){m.classList.add('hidden'); m.setAttribute('aria-hidden','true'); m.style.display='none';}})()">Close</button>
     </div>
   </div>
 
