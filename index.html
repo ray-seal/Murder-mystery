@@ -60,10 +60,11 @@
   </div>
 
   <div id="result-modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-content">
+    <div class="modal-content" role="document">
       <h2 id="result-title"></h2>
       <p id="result-text"></p>
-      <button id="close-result" class="small-btn">Close</button>
+      <!-- added type="button" and aria-label for clarity -->
+      <button id="close-result" type="button" class="small-btn" aria-label="Close result dialog">Close</button>
     </div>
   </div>
 
