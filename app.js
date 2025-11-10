@@ -1,5 +1,5 @@
-// Simple murder-mystery case generator and UI with PWA + modal fixes
-// Images are from Unsplash (free to use under Unsplash license). See README for full attributions.
+// Dynamic-modal murder-mystery app + stronger PWA handling
+// This version does NOT include a static modal in index.html — modal is created only when needed.
 
 (() => {
   'use strict';
@@ -19,16 +19,15 @@
   const cluesListEl = document.getElementById('clues-list');
   const suspectsEl = document.getElementById('suspects');
 
-  const resultModal = document.getElementById('result-modal');
-  const resultTitle = document.getElementById('result-title');
-  const resultText = document.getElementById('result-text');
-  const closeResult = document.getElementById('close-result');
+  let resultModal = null; // will be created on demand
+  let resultTitle = null;
+  let resultText = null;
+  let closeResult = null;
 
   const images = {
     crimeScene: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=1600&q=80",
   };
 
-  // Some sample victims and suspects (Unsplash photos)
   const victims = [
     { name: "Evelyn Hart", age: 42, img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80" },
     { name: "Marcus Bell", age: 36, img: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=800&q=80" },
@@ -47,7 +46,6 @@
   const locations = ["Living room", "Back alley", "Office", "Laundry room", "Rooftop"];
   const motives = ["Jealousy", "Money", "Greed", "Revenge", "Self-defense"];
 
-  // helpers
   function pickRandom(array) {
     return array[Math.floor(Math.random() * array.length)];
   }
@@ -64,25 +62,20 @@
     const weapon = pickRandom(weapons);
     const motive = pickRandom(motives);
 
-    // Choose killer among suspects
-    const suspectPool = shuffle(suspects).slice(0,4); // pick 4 suspects
+    const suspectPool = shuffle(suspects).slice(0,4);
     const killerIndex = Math.floor(Math.random() * suspectPool.length);
     suspectPool.forEach(s => delete s.isKiller);
     suspectPool[killerIndex].isKiller = true;
 
-    // Generate clues: some true, some decoys
     const clues = [];
-    // True clues (2)
     clues.push({ text: `Traces of ${weapon.toLowerCase()} material found near the body.`, pointsTo: suspectPool[killerIndex].name, truth:true });
     clues.push({ text: `A receipt found linking ${suspectPool[killerIndex].name} to the location earlier that day.`, pointsTo: suspectPool[killerIndex].name, truth:true });
 
-    // Decoy clues (3)
     const decoySuspects = suspectPool.filter((s,i)=>i!==killerIndex);
     clues.push({ text: `${decoySuspects[0].name} had a loud argument with the victim last week.`, pointsTo: decoySuspects[0].name, truth:false });
     clues.push({ text: `Security camera shows a shadowy figure near the ${place.toLowerCase()}.`, pointsTo: null, truth:false });
     clues.push({ text: `A smear of unknown lipstick on a glass found at the scene.`, pointsTo: null, truth:false });
 
-    // Randomize order
     const shuffledClues = shuffle(clues);
 
     currentCase = {
@@ -99,7 +92,6 @@
   }
 
   function renderCase(c){
-    // header photo
     heroPhoto.src = images.crimeScene;
 
     victimNameEl.textContent = c.victim.name;
@@ -109,7 +101,6 @@
     weaponEl.textContent = `Suspected weapon: ${c.weapon}`;
     motiveEl.textContent = `Possible motive: ${c.motive}`;
 
-    // clues
     cluesListEl.innerHTML = '';
     c.clues.forEach((clue, idx) => {
       const li = document.createElement('li');
@@ -118,7 +109,6 @@
       cluesListEl.appendChild(li);
     });
 
-    // suspects
     suspectsEl.innerHTML = '';
     c.suspects.forEach((s, idx) => {
       const card = document.createElement('div');
@@ -149,7 +139,6 @@
       suspectsEl.appendChild(card);
     });
 
-    // reset selection
     selectedSuspectIndex = null;
     updateSelectionUI();
   }
@@ -173,54 +162,119 @@
     const isKiller = !!suspect.isKiller;
 
     if(isKiller){
-      resultTitle.textContent = "You solved it.";
-      resultText.innerHTML = `Correct — ${suspect.name} was the killer. The weapon was ${currentCase.weapon} and the motive was ${currentCase.motive}.`;
+      showResult(`You solved it.`, `Correct — ${suspect.name} was the killer. The weapon was ${currentCase.weapon} and the motive was ${currentCase.motive}.`);
     } else {
       const real = currentCase.suspects[currentCase.killerIndex];
-      resultTitle.textContent = "Case Unsolved";
-      resultText.innerHTML = `Your accusation was wrong. ${suspect.name} was not the killer. The real killer was ${real.name}. The weapon was ${currentCase.weapon}.`;
+      showResult(`Case Unsolved`, `Your accusation was wrong. ${suspect.name} was not the killer. The real killer was ${real.name}. The weapon was ${currentCase.weapon}.`);
+    }
+  }
+
+  // Dynamically create the result modal only when needed. This avoids any static modal showing up before JS runs,
+  // and ensures close handlers are attached reliably.
+  function createResultModal(){
+    if(resultModal) return resultModal;
+
+    // container
+    const overlay = document.createElement('div');
+    overlay.id = 'result-modal';
+    overlay.className = 'modal hidden';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-hidden', 'true');
+
+    const content = document.createElement('div');
+    content.className = 'modal-content';
+    content.setAttribute('role','document');
+
+    const h2 = document.createElement('h2');
+    h2.id = 'result-title';
+    const p = document.createElement('p');
+    p.id = 'result-text';
+
+    // close button
+    const btn = document.createElement('button');
+    btn.id = 'close-result';
+    btn.type = 'button';
+    btn.className = 'small-btn';
+    btn.setAttribute('aria-label','Close result dialog');
+    btn.textContent = 'Close';
+
+    // force reload link as a fallback if something is seriously wrong
+    const reload = document.createElement('a');
+    reload.href = '.';
+    reload.className = 'small-btn';
+    reload.style.marginLeft = '8px';
+    reload.textContent = 'Reload app';
+
+    // append
+    content.appendChild(h2);
+    content.appendChild(p);
+    const controls = document.createElement('div');
+    controls.style.marginTop = '12px';
+    controls.appendChild(btn);
+    controls.appendChild(reload);
+    content.appendChild(controls);
+    overlay.appendChild(content);
+    document.body.appendChild(overlay);
+
+    // store refs
+    resultModal = overlay;
+    resultTitle = h2;
+    resultText = p;
+    closeResult = btn;
+
+    // handlers
+    function doClose(){
+      try{
+        resultModal.classList.add('hidden');
+        resultModal.setAttribute('aria-hidden','true');
+        // remove from DOM after hiding to avoid stale overlays in some PWA contexts
+        setTimeout(()=>{
+          if(resultModal && resultModal.parentNode) resultModal.parentNode.removeChild(resultModal);
+          resultModal = null; resultTitle = null; resultText = null; closeResult = null;
+        }, 220);
+      }catch(e){
+        // last resort: navigate away which effectively closes overlay
+        window.location.href = '.';
+      }
     }
 
-    showResult();
+    closeResult.addEventListener('click', (e)=>{ e.preventDefault(); doClose(); });
+    closeResult.addEventListener('touchend', (e)=>{ e.preventDefault(); doClose(); }, {passive:false});
+
+    overlay.addEventListener('click', (e)=>{ if(e.target === overlay) doClose(); });
+
+    // ESC key should also close
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') doClose(); });
+
+    return overlay;
   }
 
-  function showResult(){
-    if (!resultModal) return;
-    resultModal.classList.remove('hidden');
-    resultModal.setAttribute('aria-hidden', 'false');
+  function showResult(title, text){
+    try{
+      const modal = createResultModal();
+      if(!modal) return;
+      // set content
+      const t = modal.querySelector('#result-title');
+      const b = modal.querySelector('#result-text');
+      if(t) t.textContent = title;
+      if(b) b.textContent = text;
+
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden','false');
+
+      // ensure visible CSS display
+      modal.style.display = 'flex';
+
+    }catch(err){
+      // Very last-resort fallback: alert then reload
+      try{ alert(title + '\n\n' + text); }catch(e){}
+      // make sure app isn't blocked
+      setTimeout(()=>{ window.location.href = '.'; }, 600);
+    }
   }
 
-  function closeModal(){
-    if (!resultModal) return;
-    resultModal.classList.add('hidden');
-    resultModal.setAttribute('aria-hidden', 'true');
-  }
-
-  // Ensure the modal is hidden on start (fix for the reported issue where it appears immediately)
-  function initModalState(){
-    if (!resultModal) return;
-    resultModal.classList.add('hidden');
-    resultModal.setAttribute('aria-hidden', 'true');
-  }
-
-  // Make sure close button is interactive on touch devices
-  function attachModalHandlers(){
-    if (!closeResult || !resultModal) return;
-
-    try { closeResult.type = 'button'; } catch(e) {}
-    closeResult.addEventListener('click', closeModal);
-    closeResult.addEventListener('touchend', function onTouchEnd(e){
-      e.preventDefault();
-      closeModal();
-    }, { passive: false });
-
-    // Clicking the overlay (outside dialog) closes too
-    resultModal.addEventListener('click', (e)=>{
-      if(e.target === resultModal) closeModal();
-    });
-  }
-
-  // PWA: service worker registration and install prompt handling
+  // PWA: register service worker (safe, wrapped in try/catch)
   function registerServiceWorker(){
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').then(reg => {
@@ -231,32 +285,31 @@
     }
   }
 
-  // Setup UI events
   function attachUI(){
-    startBtn.addEventListener('click', () => {
+    if(startBtn) startBtn.addEventListener('click', () => {
       const c = generateCase();
       renderCase(c);
-      startScreen.classList.add('hidden');
-      startScreen.setAttribute('aria-hidden', 'true');
-      gameScreen.classList.remove('hidden');
-      gameScreen.setAttribute('aria-hidden', 'false');
+      if(startScreen){ startScreen.classList.add('hidden'); startScreen.setAttribute('aria-hidden','true'); }
+      if(gameScreen){ gameScreen.classList.remove('hidden'); gameScreen.setAttribute('aria-hidden','false'); }
     });
 
-    newCaseBtn.addEventListener('click', () => {
+    if(newCaseBtn) newCaseBtn.addEventListener('click', () => {
       const c = generateCase();
       renderCase(c);
       window.scrollTo({top:0, behavior:'smooth'});
     });
   }
 
-  // DOM ready
-  document.addEventListener('DOMContentLoaded', () => {
-    initModalState();
-    attachModalHandlers();
-    attachUI();
-    registerServiceWorker();
-    // pre-generate a case for quick start (but don't show anything)
-    // generateCase(); // commented to avoid accidental modal triggers
+  document.addEventListener('DOMContentLoaded', ()=>{
+    try{
+      attachUI();
+      registerServiceWorker();
+      // ensure no modal exists from older cached HTML
+      const existing = document.getElementById('result-modal');
+      if(existing) existing.parentNode.removeChild(existing);
+    }catch(e){
+      console.error('App init error', e);
+    }
   });
 
 })();
