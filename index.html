@@ -3,11 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Murder Mystery — Case Files</title>
+  <title>Case Files</title>
 
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- PWA / manifest -->
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#f4e7c3">
+  <link rel="apple-touch-icon" href="/icon.svg">
 </head>
 <body>
   <div id="app" class="app">
@@ -19,15 +24,15 @@
     <main class="main">
       <section id="start-screen" class="start-screen">
         <img class="crime-photo" id="hero-photo" src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=1200&q=80" alt="case file">
-        <button id="start-btn" class="start-btn">Start Case</button>
+        <button id="start-btn" type="button" class="start-btn">Start Case</button>
         <p class="hint">Click Start to generate a new case. Each case is unique — suspects, clues and motives change every time.</p>
       </section>
 
-      <section id="game-screen" class="game-screen hidden">
+      <section id="game-screen" class="game-screen hidden" aria-hidden="true">
         <aside class="case-panel">
           <div class="case-header">
             <h2>CASE</h2>
-            <button id="new-case" class="small-btn">New Case</button>
+            <button id="new-case" class="small-btn" type="button">New Case</button>
           </div>
 
           <div id="case-summary" class="case-summary">
@@ -59,15 +64,15 @@
     </footer>
   </div>
 
-  <div id="result-modal" class="modal hidden" role="dialog" aria-modal="true">
+  <!-- Result modal; start hidden and explicitly aria-hidden -->
+  <div id="result-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-content" role="document">
       <h2 id="result-title"></h2>
       <p id="result-text"></p>
-      <!-- added type="button" and aria-label for clarity -->
       <button id="close-result" type="button" class="small-btn" aria-label="Close result dialog">Close</button>
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js" defer></script>
 </body>
 </html>
