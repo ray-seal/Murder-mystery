@@ -1,85 +1,78 @@
-// Service worker: navigation/network-first strategy (fixed)
-// Removed stray token at top and hardened fetch handlers.
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Case Files</title>
 
-const CACHE_NAME = 'case-files-v2';
-const ASSETS = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/manifest.webmanifest',
-  '/icon.svg'
-];
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
-  );
-  self.skipWaiting();
-});
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#f4e7c3">
+  <link rel="apple-touch-icon" href="/icon.svg">
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="header">
+      <h1 class="title">The Case Files</h1>
+      <p class="subtitle">Can you uncover the killer?</p>
+    </header>
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.map(k => (k !== CACHE_NAME) ? caches.delete(k) : Promise.resolve())
-    ))
-  );
-  self.clients.claim();
-});
+    <main class="main">
+      <section id="start-screen" class="start-screen">
+        <img class="crime-photo" id="hero-photo" src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=1200&q=80" alt="case file">
+        <button id="start-btn" type="button" class="start-btn">Start Case</button>
+        <p class="hint">Click Start to generate a new case. Each case is unique — suspects, clues and motives change every time.</p>
+      </section>
 
-self.addEventListener('fetch', (event) => {
-  const req = event.request;
-  if (req.method !== 'GET') return;
+      <section id="game-screen" class="game-screen hidden" aria-hidden="true">
+        <aside class="case-panel">
+          <div class="case-header">
+            <h2>CASE</h2>
+            <button id="new-case" class="small-btn" type="button">New Case</button>
+          </div>
 
-  const url = new URL(req.url);
+          <div id="case-summary" class="case-summary">
+            <h3 id="victim-name">Victim</h3>
+            <img id="victim-img" class="victim-img" src="" alt="victim">
+            <ul class="case-details">
+              <li id="victim-age"></li>
+              <li id="location"></li>
+              <li id="weapon"></li>
+              <li id="motive"></li>
+            </ul>
+          </div>
 
-  // Navigation requests: network-first so installed PWA gets updated HTML.
-  if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
-    event.respondWith((async () => {
-      try {
-        const networkResponse = await fetch(req);
-        // Update cache with fresh HTML for future fallback
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(req, networkResponse.clone()).catch(() => {/* swallow cache errors */});
-        return networkResponse;
-      } catch (err) {
-        // Network failed, fall back to cached index.html or a basic offline response
-        const cached = await caches.match('/index.html');
-        return cached || new Response('<h1>Offline</h1>', {
-          headers: { 'Content-Type': 'text/html' },
-          status: 503,
-          statusText: 'Service Unavailable'
-        });
-      }
-    })());
-    return;
-  }
+          <div class="clues">
+            <h3>Clues</h3>
+            <ul id="clues-list" class="clues-list"></ul>
+          </div>
+        </aside>
 
-  // Images: network-first with cache fallback
-  if (req.destination === 'image' || url.hostname.includes('images.unsplash.com')) {
-    event.respondWith((async () => {
-      try {
-        const networkRes = await fetch(req);
-        // Optionally cache images (best-effort)
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(req, networkRes.clone()).catch(() => {/* ignore */});
-        return networkRes;
-      } catch (err) {
-        return caches.match(req);
-      }
-    })());
-    return;
-  }
+        <section class="suspects-panel">
+          <h3>Suspects</h3>
+          <div id="suspects" class="suspects-grid"></div>
+        </section>
+      </section>
+    </main>
 
-  // Other requests: cache-first, then network, then fallback to cache root
-  event.respondWith((async () => {
-    const cached = await caches.match(req);
-    if (cached) return cached;
-    try {
-      const networkRes = await fetch(req);
-      return networkRes;
-    } catch (err) {
-      return caches.match('/') || new Response(null, { status: 504, statusText: 'Gateway Timeout' });
-    }
-  })());
-});
+    <footer class="footer">
+      <p>Photos via Unsplash — free to use. See README for attributions.</p>
+    </footer>
+
+    <!-- Inline result panel replaces modal. Starts hidden. -->
+    <div id="result-panel" class="result-panel hidden" aria-live="polite" aria-hidden="true">
+      <h2 id="result-title"></h2>
+      <p id="result-text"></p>
+      <div class="result-actions">
+        <button id="result-close" class="small-btn" type="button">Close</button>
+        <button id="result-newcase" class="small-btn" type="button">New Case</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
