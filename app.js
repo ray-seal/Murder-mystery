@@ -135,6 +135,7 @@ function renderCase(c){
     const accuseBtn = document.createElement('button');
     accuseBtn.textContent = 'Accuse';
     accuseBtn.className = 'small-btn';
+    accuseBtn.type = 'button';
     accuseBtn.style.marginTop = '8px';
     accuseBtn.addEventListener('click', (ev) => {
       ev.stopPropagation();
@@ -189,6 +190,25 @@ function closeModal(){
   resultModal.classList.add('hidden');
 }
 
+// Make sure close button is interactive on touch devices
+if (closeResult) {
+  // ensure it's treated as a button
+  try { closeResult.type = 'button'; } catch(e) {}
+  // normal click handler
+  closeResult.addEventListener('click', closeModal);
+
+  // also handle touchend for iOS so taps reliably close the dialog
+  closeResult.addEventListener('touchend', function onTouchEnd(e){
+    e.preventDefault(); // prevent double events
+    closeModal();
+  }, { passive: false });
+}
+
+// Clicking the overlay (outside dialog) closes too
+resultModal.addEventListener('click', (e)=>{
+  if(e.target === resultModal) closeModal();
+});
+
 startBtn.addEventListener('click', () => {
   const c = generateCase();
   renderCase(c);
@@ -200,13 +220,4 @@ newCaseBtn.addEventListener('click', () => {
   const c = generateCase();
   renderCase(c);
   window.scrollTo({top:0, behavior:'smooth'});
-});
-
-closeResult.addEventListener('click', () => {
-  closeModal();
-});
-
-// Allow clicking outside modal content to close
-resultModal.addEventListener('click', (e)=>{
-  if(e.target === resultModal) closeModal();
 });
