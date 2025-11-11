@@ -1,5 +1,5 @@
 // Service worker: use navigation/network-first strategy and bump cache name so installed PWAs update
-const CACHE_NAME = 'case-files-v2';
+const CACHE_NAME = 'case-files-v3';
 const ASSETS = [
   '/',
   '/index.html',

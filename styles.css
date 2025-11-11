@@ -67,11 +67,12 @@ body{
 }
 
 .crime-photo{
-  max-width:80%;
+  max-width:60%;
   border-radius:8px;
   border:6px solid rgba(0,0,0,0.04);
   box-shadow:0 8px 30px rgba(0,0,0,0.12);
   margin-bottom:18px;
+  object-fit:cover;
 }
 
 .start-btn{
@@ -173,7 +174,7 @@ body{
 
 .victim-img{
   width:100%;
-  height:160px;
+  height:120px;
   object-fit:cover;
   border-radius:6px;
   margin-bottom:8px;
@@ -222,7 +223,7 @@ body{
 
 .suspect.selected{ border-color:var(--accent); box-shadow:0 12px 30px rgba(179,0,0,0.12); }
 
-.suspect img{ width:100%; height:160px; object-fit:cover; border-radius:6px; }
+.suspect img{ width:100%; height:120px; object-fit:cover; border-radius:6px; }
 
 .suspect h4{ margin:8px 0 0 0; font-size:16px; color:var(--muted) }
 .suspect p{ margin:4px 0 0 0; font-size:13px; color:#5a4f3a }
@@ -260,4 +261,97 @@ body{
 #close-result {
   -webkit-tap-highlight-color: rgba(0,0,0,0.08);
   touch-action: manipulation;
+}
+
+/* Tasks section */
+.tasks-section {
+  margin-top: 14px;
+}
+
+.tasks-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.task-btn {
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(179,0,0,0.85), rgba(139,0,0,0.9));
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+  transition: transform .1s ease, opacity .2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-weight: 500;
+}
+
+.task-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.task-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(180deg, rgba(100,100,100,0.5), rgba(80,80,80,0.6));
+}
+
+.task-btn.completed {
+  background: linear-gradient(180deg, rgba(60,120,60,0.85), rgba(40,100,40,0.9));
+  opacity: 0.7;
+}
+
+.task-btn .task-duration {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-left: 6px;
+}
+
+/* Action log */
+.action-log-section {
+  margin-top: 14px;
+}
+
+.action-log {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.log-entry {
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  border-left: 3px solid rgba(179,0,0,0.3);
+}
+
+.log-entry.clue-reveal {
+  border-left-color: rgba(179,0,0,0.6);
+  font-weight: 500;
+}
+
+.log-entry-time {
+  font-size: 11px;
+  color: #6b5a3c;
+  opacity: 0.7;
+  margin-right: 6px;
+}
+
+/* Suspect metadata */
+.suspect-meta {
+  font-size: 11px;
+  color: #7a6b4d;
+  margin-top: 4px;
+  font-style: italic;
 }

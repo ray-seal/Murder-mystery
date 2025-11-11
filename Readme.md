@@ -1,14 +1,48 @@
 # The Case Files — Murder Mystery (Static Web App)
 
-A small static murder-mystery game designed for quick deployment on Vercel. Each time you "Start Case" the app generates a random case: victim, suspects, killer, weapon, location and clues. Players inspect clues and accuse a suspect.
+A static murder-mystery investigation game with interactive evidence-gathering tasks. Each case generates a unique victim, suspects, killer, weapon, location, and hidden clues that must be uncovered through investigation.
 
-Design notes:
+## Features
+
+- **Interactive Investigation Tasks**: Players must actively investigate by running forensic tasks like dusting for fingerprints, analyzing fibers, checking databases, interviewing witnesses, and running blood analysis.
+- **Time-Based Task System**: Each investigation task takes time to complete (simulated with delays), making the experience more realistic and engaging.
+- **Evidence-Based Accusations**: Players must complete at least 2 investigation tasks before they can make an accusation, ensuring thoughtful detective work.
+- **Action Log**: Track all investigation activities and evidence discoveries in real-time.
+- **Detailed Suspect Profiles**: Each suspect and victim includes gender and ethnicity information for more realistic character building.
+- **Progressive Web App (PWA)**: Install the app on your device and play offline.
+
+## How to Play
+
+1. Click "Start Case" to generate a new murder mystery.
+2. Review the case details: victim information, location, suspected weapon, and possible motive.
+3. **Run Investigation Tasks**: Click on investigation tasks to execute them. Each task takes a few seconds and reveals evidence.
+4. **Review Evidence**: As you complete tasks, clues will be revealed in the Clues section and logged in the Action Log.
+5. **Make Your Accusation**: Once you've gathered enough evidence (minimum 2 tasks), click "Accuse" on the suspect you believe is guilty.
+6. The game will reveal whether you solved the case!
+
+## Design Notes
+
 - Colour scheme: beige/old paper + blood red accents.
 - Title uses a typewriter style font (Special Elite).
 - Start button styled to look like dripping blood.
 - Uses free photos from Unsplash (see attributions below).
 
-How to deploy to Vercel:
+## PWA Support
+
+This app is a Progressive Web App (PWA) and can be installed on your device:
+
+1. **On Desktop**: Visit the site in Chrome/Edge and look for the install icon in the address bar.
+2. **On Mobile**: Visit the site and use "Add to Home Screen" from your browser menu.
+3. **Offline Support**: Once installed, the app works offline (though new cases require network for images).
+
+**To Update PWA**: If you've previously installed the app and need to update to the latest version:
+1. Uninstall the current PWA from your device
+2. Clear browser cache for the site
+3. Revisit the site and reinstall the PWA
+
+## Deployment
+
+### Deploy to Vercel:
 1. Push these files to a GitHub repo (already in this repo).
 2. Go to https://vercel.com/new, import the repository, leave defaults (Framework Preset: Other — Static Site).
 3. Vercel will auto-deploy the site. Alternatively, use the Vercel CLI:
