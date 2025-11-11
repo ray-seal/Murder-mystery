@@ -25,21 +25,21 @@
   let closeResult = null;
 
   const images = {
-    crimeScene: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=1600&q=80",
+    crimeScene: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=800&q=60",
   };
 
   const victims = [
-    { name: "Evelyn Hart", age: 42, img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80" },
-    { name: "Marcus Bell", age: 36, img: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=800&q=80" },
-    { name: "Lydia Park", age: 27, img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80" }
+    { name: "Evelyn Hart", age: 42, gender: "Female", ethnicity: "Caucasian", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=60" },
+    { name: "Marcus Bell", age: 36, gender: "Male", ethnicity: "Caucasian", img: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=400&q=60" },
+    { name: "Lydia Park", age: 27, gender: "Female", ethnicity: "Asian", img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=60" }
   ];
 
   const suspects = [
-    { name: "Henry Cross", role: "Neighbor", img: "https://images.unsplash.com/photo-1545996124-6b0b8d0be3ad?auto=format&fit=crop&w=800&q=80" },
-    { name: "Sofia Miles", role: "Colleague", img: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=800&q=80" },
-    { name: "Jamal Reed", role: "Ex-partner", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80" },
-    { name: "Clara Voss", role: "Landlord", img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80" },
-    { name: "Logan Price", role: "Business Partner", img: "https://images.unsplash.com/photo-1543862473-c07d38a6f0f9?auto=format&fit=crop&w=800&q=80" }
+    { name: "Henry Cross", role: "Neighbor", gender: "Male", ethnicity: "Caucasian", img: "https://images.unsplash.com/photo-1545996124-6b0b8d0be3ad?auto=format&fit=crop&w=400&q=60" },
+    { name: "Sofia Miles", role: "Colleague", gender: "Female", ethnicity: "Hispanic", img: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=400&q=60" },
+    { name: "Rachel Foster", role: "Ex-partner", gender: "Female", ethnicity: "Caucasian", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=60" },
+    { name: "Clara Voss", role: "Landlord", gender: "Female", ethnicity: "Asian", img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&q=60" },
+    { name: "Logan Price", role: "Business Partner", gender: "Male", ethnicity: "African American", img: "https://images.unsplash.com/photo-1543862473-c07d38a6f0f9?auto=format&fit=crop&w=400&q=60" }
   ];
 
   const weapons = ["Letter opener", "Kitchen knife", "Antique candlestick", "Lead pipe", "Poison (bottle)"];
@@ -55,6 +55,8 @@
 
   let currentCase = null;
   let selectedSuspectIndex = null;
+  let completedTasks = [];
+  let actionLog = [];
 
   function generateCase(){
     const victim = pickRandom(victims);
@@ -67,16 +69,142 @@
     suspectPool.forEach(s => delete s.isKiller);
     suspectPool[killerIndex].isKiller = true;
 
-    const clues = [];
-    clues.push({ text: `Traces of ${weapon.toLowerCase()} material found near the body.`, pointsTo: suspectPool[killerIndex].name, truth:true });
-    clues.push({ text: `A receipt found linking ${suspectPool[killerIndex].name} to the location earlier that day.`, pointsTo: suspectPool[killerIndex].name, truth:true });
-
+    const killer = suspectPool[killerIndex];
     const decoySuspects = suspectPool.filter((s,i)=>i!==killerIndex);
-    clues.push({ text: `${decoySuspects[0].name} had a loud argument with the victim last week.`, pointsTo: decoySuspects[0].name, truth:false });
-    clues.push({ text: `Security camera shows a shadowy figure near the ${place.toLowerCase()}.`, pointsTo: null, truth:false });
-    clues.push({ text: `A smear of unknown lipstick on a glass found at the scene.`, pointsTo: null, truth:false });
 
-    const shuffledClues = shuffle(clues);
+    // Generate all clues (hidden initially, revealed by tasks)
+    const allClues = [];
+    
+    // Initial visible clues (no task required)
+    allClues.push({ 
+      text: `Victim found in ${place.toLowerCase()}.`, 
+      pointsTo: null, 
+      truth: false, 
+      sourceTask: null, 
+      visible: true 
+    });
+
+    // Dust for prints clues
+    allClues.push({ 
+      text: `Partial fingerprint (ID: FP-${Math.floor(Math.random()*9000+1000)}) found on ${weapon.toLowerCase()}.`, 
+      pointsTo: killer.name, 
+      truth: true, 
+      sourceTask: 'dust',
+      visible: false 
+    });
+
+    // Shoe imprint database clues
+    allClues.push({ 
+      text: `Shoe imprint matches size ${8 + Math.floor(Math.random()*5)}, commonly worn by ${killer.name}.`, 
+      pointsTo: killer.name, 
+      truth: true, 
+      sourceTask: 'shoeDB',
+      visible: false 
+    });
+
+    // Interview clues
+    allClues.push({ 
+      text: `${killer.name} claims to have been elsewhere during the incident, but cannot provide witnesses.`, 
+      pointsTo: killer.name, 
+      truth: true, 
+      sourceTask: 'interview',
+      visible: false 
+    });
+    allClues.push({ 
+      text: `${decoySuspects[0].name} was at a public event with multiple witnesses at the time.`, 
+      pointsTo: decoySuspects[0].name, 
+      truth: false, 
+      sourceTask: 'interview',
+      visible: false 
+    });
+
+    // Fiber analysis clues
+    allClues.push({ 
+      text: `Fabric fibers found at scene match clothing owned by ${killer.name}.`, 
+      pointsTo: killer.name, 
+      truth: true, 
+      sourceTask: 'fibers',
+      visible: false 
+    });
+    allClues.push({ 
+      text: `Generic cotton fibers found - inconclusive.`, 
+      pointsTo: null, 
+      truth: false, 
+      sourceTask: 'fibers',
+      visible: false 
+    });
+
+    // Blood analysis clues
+    allClues.push({ 
+      text: `Blood type matches victim. No other blood found at scene.`, 
+      pointsTo: null, 
+      truth: false, 
+      sourceTask: 'blood',
+      visible: false 
+    });
+
+    // Decoy clues
+    allClues.push({ 
+      text: `${decoySuspects[1].name} had a financial dispute with the victim last month.`, 
+      pointsTo: decoySuspects[1].name, 
+      truth: false, 
+      sourceTask: 'interview',
+      visible: false 
+    });
+    allClues.push({ 
+      text: `Security camera shows a shadowy figure near the ${place.toLowerCase()}.`, 
+      pointsTo: null, 
+      truth: false, 
+      sourceTask: 'dust',
+      visible: false 
+    });
+
+    // Define investigation tasks
+    const tasks = [
+      {
+        id: 'dust',
+        label: 'Dust for Fingerprints',
+        duration: 2000,
+        completed: false,
+        dependencies: [],
+        description: 'Analyze surfaces for fingerprints'
+      },
+      {
+        id: 'shoeDB',
+        label: 'Check Shoe Imprint Database',
+        duration: 2500,
+        completed: false,
+        dependencies: [],
+        description: 'Search database for matching shoe prints'
+      },
+      {
+        id: 'interview',
+        label: 'Interview Witnesses',
+        duration: 3000,
+        completed: false,
+        dependencies: [],
+        description: 'Question suspects and witnesses'
+      },
+      {
+        id: 'fibers',
+        label: 'Analyze Fabric Fibers',
+        duration: 2500,
+        completed: false,
+        dependencies: [],
+        description: 'Examine fiber evidence from scene'
+      },
+      {
+        id: 'blood',
+        label: 'Run Blood Analysis',
+        duration: 3500,
+        completed: false,
+        dependencies: [],
+        description: 'Test blood samples from scene'
+      }
+    ];
+
+    completedTasks = [];
+    actionLog = [];
 
     currentCase = {
       victim,
@@ -85,7 +213,8 @@
       motive,
       suspects: suspectPool,
       killerIndex,
-      clues: shuffledClues
+      clues: allClues,
+      tasks: tasks
     };
 
     return currentCase;
@@ -96,18 +225,14 @@
 
     victimNameEl.textContent = c.victim.name;
     victimImgEl.src = c.victim.img;
-    victimAgeEl.textContent = `Age: ${c.victim.age}`;
+    victimAgeEl.textContent = `Age: ${c.victim.age} | ${c.victim.gender}, ${c.victim.ethnicity}`;
     locationEl.textContent = `Location: ${c.place}`;
     weaponEl.textContent = `Suspected weapon: ${c.weapon}`;
     motiveEl.textContent = `Possible motive: ${c.motive}`;
 
-    cluesListEl.innerHTML = '';
-    c.clues.forEach((clue, idx) => {
-      const li = document.createElement('li');
-      li.className = 'clue';
-      li.textContent = clue.text;
-      cluesListEl.appendChild(li);
-    });
+    renderClues();
+    renderTasks();
+    renderActionLog();
 
     suspectsEl.innerHTML = '';
     c.suspects.forEach((s, idx) => {
@@ -115,7 +240,12 @@
       card.className = 'suspect';
       card.dataset.index = idx;
 
-      card.innerHTML = `\n        <img src="${s.img}" alt="${s.name}" />\n        <h4>${s.name}</h4>\n        <p>${s.role}</p>\n      `;
+      card.innerHTML = `
+        <img src="${s.img}" alt="${s.name}" />
+        <h4>${s.name}</h4>
+        <p>${s.role}</p>
+        <div class="suspect-meta">${s.gender}, ${s.ethnicity}</div>
+      `;
 
       card.addEventListener('click', () => {
         selectSuspect(idx);
@@ -139,6 +269,110 @@
     updateSelectionUI();
   }
 
+  function renderClues(){
+    if(!currentCase) return;
+    cluesListEl.innerHTML = '';
+    const visibleClues = currentCase.clues.filter(c => c.visible);
+    visibleClues.forEach((clue, idx) => {
+      const li = document.createElement('li');
+      li.className = 'clue';
+      li.textContent = clue.text;
+      cluesListEl.appendChild(li);
+    });
+  }
+
+  function renderTasks(){
+    if(!currentCase) return;
+    const tasksPanel = document.getElementById('tasks-panel');
+    if(!tasksPanel) return;
+
+    tasksPanel.innerHTML = '';
+    currentCase.tasks.forEach(task => {
+      const btn = document.createElement('button');
+      btn.className = 'task-btn';
+      btn.type = 'button';
+      btn.dataset.taskId = task.id;
+      
+      const canRun = task.dependencies.every(dep => completedTasks.includes(dep));
+      
+      if(task.completed){
+        btn.classList.add('completed');
+        btn.disabled = true;
+        btn.innerHTML = `${task.label} ✓`;
+      } else if(!canRun){
+        btn.disabled = true;
+        btn.innerHTML = `${task.label} <span class="task-duration">(locked)</span>`;
+      } else {
+        btn.innerHTML = `${task.label} <span class="task-duration">(${task.duration/1000}s)</span>`;
+        btn.addEventListener('click', () => runTask(task.id));
+      }
+      
+      tasksPanel.appendChild(btn);
+    });
+  }
+
+  function renderActionLog(){
+    const logEl = document.getElementById('action-log');
+    if(!logEl) return;
+
+    logEl.innerHTML = '';
+    if(actionLog.length === 0){
+      logEl.innerHTML = '<div class="log-entry" style="opacity:0.6;">No actions taken yet.</div>';
+      return;
+    }
+
+    actionLog.forEach(entry => {
+      const div = document.createElement('div');
+      div.className = entry.isClue ? 'log-entry clue-reveal' : 'log-entry';
+      div.innerHTML = `<span class="log-entry-time">${entry.time}</span>${entry.text}`;
+      logEl.appendChild(div);
+    });
+
+    // Scroll to bottom
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function addLogEntry(text, isClue = false){
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    actionLog.push({ time: timeStr, text, isClue });
+    renderActionLog();
+  }
+
+  function runTask(taskId){
+    if(!currentCase) return;
+    
+    const task = currentCase.tasks.find(t => t.id === taskId);
+    if(!task || task.completed) return;
+
+    // Disable task button during execution
+    const btn = document.querySelector(`[data-task-id="${taskId}"]`);
+    if(btn){
+      btn.disabled = true;
+      btn.innerHTML = `${task.label} <span class="task-duration">(Running...)</span>`;
+    }
+
+    addLogEntry(`Started: ${task.label}`);
+
+    // Simulate task duration
+    setTimeout(() => {
+      task.completed = true;
+      completedTasks.push(taskId);
+
+      // Reveal clues associated with this task
+      const taskClues = currentCase.clues.filter(c => c.sourceTask === taskId && !c.visible);
+      taskClues.forEach(clue => {
+        clue.visible = true;
+        addLogEntry(`Evidence found: ${clue.text}`, true);
+      });
+
+      addLogEntry(`Completed: ${task.label}`);
+      
+      renderClues();
+      renderTasks();
+    }, task.duration);
+  }
+
   function selectSuspect(i){
     selectedSuspectIndex = i;
     updateSelectionUI();
@@ -157,11 +391,24 @@
     const suspect = currentCase.suspects[i];
     const isKiller = !!suspect.isKiller;
 
+    // Check if enough investigation has been done
+    const minTasksRequired = 2;
+    if(completedTasks.length < minTasksRequired){
+      const remaining = minTasksRequired - completedTasks.length;
+      showResult(
+        `Insufficient Evidence`, 
+        `You need to complete at least ${minTasksRequired} investigation tasks before making an accusation. Complete ${remaining} more task(s) to gather more evidence.`
+      );
+      return;
+    }
+
+    addLogEntry(`Accusation made: ${suspect.name}`);
+
     if(isKiller){
-      showResult(`You solved it.`, `Correct — ${suspect.name} was the killer. The weapon was ${currentCase.weapon} and the motive was ${currentCase.motive}.`);
+      showResult(`You solved it.`, `Correct — ${suspect.name} was the killer. The weapon was ${currentCase.weapon} and the motive was ${currentCase.motive}. You completed ${completedTasks.length} investigation tasks.`);
     } else {
       const real = currentCase.suspects[currentCase.killerIndex];
-      showResult(`Case Unsolved`, `Your accusation was wrong. ${suspect.name} was not the killer. The real killer was ${real.name}. The weapon was ${currentCase.weapon}.`);
+      showResult(`Case Unsolved`, `Your accusation was wrong. ${suspect.name} was not the killer. The real killer was ${real.name}. The weapon was ${currentCase.weapon}. Review the evidence more carefully.`);
     }
   }
 
