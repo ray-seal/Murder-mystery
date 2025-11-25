@@ -18,12 +18,50 @@
     <header class="header">
       <h1 class="title">The Case Files</h1>
       <p class="subtitle">Welcome Detective!</p>
+      <div class="solved-counter" id="solved-counter">Solved: 0</div>
     </header>
 
     <main class="main">
       <section id="start-screen" class="start-screen">
         <img class="crime-photo" id="hero-photo" src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=1200&q=80" alt="case file">
         <h2>Welcome to Case Files</h2>
+        
+        <div class="tabs-container">
+          <button class="tab-btn active" id="tab-open" data-tab="open">Open Cases <span class="badge" id="open-count">0</span></button>
+          <button class="tab-btn" id="tab-closed" data-tab="closed">Closed Cases <span class="badge" id="closed-count">0</span></button>
+        </div>
+        
+        <div class="cases-list" id="cases-list">
+          <p class="no-cases-msg" id="no-cases-msg">Loading cases...</p>
+        </div>
+      </section>
+      
+      <section id="game-screen" class="game-screen hidden">
+        <div class="game-header">
+          <button class="back-btn" id="back-btn">&larr; Back to Cases</button>
+          <button class="save-btn" id="save-btn">Save Game</button>
+        </div>
+        <div class="case-panel" id="case-panel">
+          <h3 class="case-title" id="case-title"></h3>
+          <p class="case-summary" id="case-summary"></p>
+          <div class="victim-info" id="victim-info"></div>
+          <div class="timeline-section" id="timeline-section"></div>
+          <div class="clues-section" id="clues-section"></div>
+        </div>
+        <div class="suspects-panel" id="suspects-panel">
+          <h3>Suspects</h3>
+          <div class="suspects-list" id="suspects-list"></div>
+          <div class="accusation-section" id="accusation-section">
+            <label for="suspect-select">Accuse Suspect:</label>
+            <select id="suspect-select"><option value="">Select a suspect...</option></select>
+            <button class="accuse-btn" id="accuse-btn">Make Accusation</button>
+          </div>
+        </div>
+        <div class="notes-panel" id="notes-panel">
+          <h4>Your Notes</h4>
+          <textarea id="player-notes" placeholder="Type your notes here..."></textarea>
+        </div>
+        <button class="close-case-btn" id="close-case-btn">Mark Case as Solved</button>
       </section>
     </main>
 
