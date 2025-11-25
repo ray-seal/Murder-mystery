@@ -1,8 +1,109 @@
 {
-  "victim": {"name": "", "age": "", "img": ""},
-  "location": "",
-  "weapon": "",
-  "motive": "",
-  "suspects": [],
-  "clues": []
+  "case_id": "M-0142",
+  "title": "The Library Stairwell Murder",
+  "status": "open",
+  "created_date": "2025-02-03",
+  "last_updated": "2025-02-03",
+
+  "summary": "Jonathan Pierce, a respected local historian, was found dead at the base of the old town library's west stairwell. The initial assumption was an accidental fall, but forensic signs and witness statements suggest foul play.",
+
+  "victim": {
+    "name": "Jonathan Pierce",
+    "age": 54,
+    "occupation": "Historian & Archivist",
+    "last_known_location": "Ravenswood Public Library — West Wing"
+  },
+
+  "cause_of_death": {
+    "primary": "Blunt force trauma to the back of the head",
+    "notes": "Impact pattern inconsistent with a simple fall. Likely struck before tumbling down the stairs."
+  },
+
+  "suspects": [
+    {
+      "id": "S-001",
+      "name": "Evelyn Rowe",
+      "relationship_to_victim": "Research assistant",
+      "notes": "Argued with the victim earlier the same day regarding suppression of historical documents.",
+      "alibi": "Claims she was in the microfilm room from 18:00–19:00."
+    },
+    {
+      "id": "S-002",
+      "name": "Thomas Granger",
+      "relationship_to_victim": "Rival historian",
+      "notes": "Recently publicly accused Pierce of falsifying portions of a published timeline.",
+      "alibi": "States he was home preparing a lecture; no witnesses."
+    },
+    {
+      "id": "S-003",
+      "name": "Mysterious Visitor",
+      "relationship_to_victim": "Unknown",
+      "notes": "Library staff recall seeing an unidentified man speaking with Pierce shortly before closing.",
+      "alibi": "Unknown"
+    }
+  ],
+
+  "timeline": [
+    {
+      "time": "17:42",
+      "event": "Victim seen entering the library's west wing carrying a satchel."
+    },
+    {
+      "time": "18:10",
+      "event": "Raised voices heard from archive office. Believed to be Pierce and Evelyn Rowe."
+    },
+    {
+      "time": "18:27",
+      "event": "Unidentified visitor seen on security camera entering west wing."
+    },
+    {
+      "time": "18:51",
+      "event": "Camera in west stairwell briefly glitches; last frame shows someone standing behind Pierce."
+    },
+    {
+      "time": "19:03",
+      "event": "Janitor discovers the body at the base of the stairwell and contacts authorities."
+    }
+  ],
+
+  "evidence": [
+    {
+      "id": "E-001",
+      "type": "image",
+      "description": "Security camera still—slightly corrupted—showing a figure behind Pierce.",
+      "file": "evidence/stairwell_cam_E001.jpg"
+    },
+    {
+      "id": "E-002",
+      "type": "document",
+      "description": "Victim’s notebook page found torn near the scene, containing partially legible notes.",
+      "file": "evidence/notebook_page_E002.png"
+    },
+    {
+      "id": "E-003",
+      "type": "audio",
+      "description": "Voicemail left for Pierce earlier that afternoon, containing a cryptic warning.",
+      "file": "evidence/voicemail_E003.mp3"
+    },
+    {
+      "id": "E-004",
+      "type": "document",
+      "description": "Library access log for staff areas from 17:00–19:00.",
+      "file": "evidence/access_log_E004.txt"
+    }
+  ],
+
+  "initial_clues": [
+    "Camera glitch suggests possible tampering.",
+    "The visitor was not logged in the access system.",
+    "Victim’s notebook references 'the sealed ledger' and 'E. will not understand.'",
+    "Blunt force angle suggests attacker was facing the victim."
+  ],
+
+  "notes": [
+    "Need to identify unknown visitor.",
+    "Compare alibis with access log timestamps.",
+    "Check whether Evelyn's microfilm alibi is verifiable.",
+    "Investigate motive tied to 'sealed ledger'."
+  ]
 }
