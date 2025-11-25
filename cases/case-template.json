@@ -1,0 +1,31 @@
+{
+  "id": "example-1",
+  "title": "Example Case",
+  "victim": {
+    "name": "",
+    "age": "",
+    "occupation": "",
+    "last_known_location": ""
+  },
+  "location": "",
+  "weapon": "",
+  "motive": "",
+  "cause_of_death": {
+    "primary": "",
+    "notes": ""
+  },
+  "suspects": [
+    {
+      "id": "S-001",
+      "name": "",
+      "relationship_to_victim": "",
+      "notes": "",
+      "alibi": ""
+    }
+  ],
+  "clues": [],
+  "timeline": [],
+  "evidence": [],
+  "initial_clues": [],
+  "notes": []
+}

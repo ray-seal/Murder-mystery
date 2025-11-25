@@ -61,3 +61,316 @@ body{
 
 .small-btn{ background:transparent; border:1px solid rgba(0,0,0,0.08); padding:6px 10px; border-radius:6px; cursor:pointer; }
 .footer{ padding:12px 20px; text-align:center; font-size:13px; color:#6b5a3c; }
+
+/* Solved counter in header */
+.solved-counter{
+  display:inline-block;
+  background:linear-gradient(180deg,var(--accent), #8a0000);
+  color:#fff;
+  padding:6px 14px;
+  border-radius:20px;
+  font-size:14px;
+  font-weight:700;
+  margin-top:8px;
+}
+
+/* Tabs container */
+.tabs-container{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin:20px 0;
+}
+
+.tab-btn{
+  position:relative;
+  background:var(--card);
+  border:2px solid rgba(0,0,0,0.1);
+  padding:10px 20px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:15px;
+  font-weight:500;
+  transition:all 0.2s ease;
+}
+
+.tab-btn:hover{
+  border-color:var(--accent);
+}
+
+.tab-btn.active{
+  background:linear-gradient(180deg,var(--accent), #8a0000);
+  color:#fff;
+  border-color:var(--accent);
+}
+
+.badge{
+  display:inline-block;
+  background:rgba(0,0,0,0.15);
+  color:inherit;
+  padding:2px 8px;
+  border-radius:12px;
+  font-size:12px;
+  margin-left:6px;
+}
+
+.tab-btn.active .badge{
+  background:rgba(255,255,255,0.25);
+}
+
+/* Cases list */
+.cases-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  max-width:600px;
+  margin:0 auto;
+  text-align:left;
+}
+
+.case-item{
+  background:var(--card);
+  padding:14px 18px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  transition:all 0.2s ease;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.case-item:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.15);
+}
+
+.case-item .case-title{
+  font-weight:600;
+  color:#2b2b2b;
+  margin:0;
+}
+
+.case-item .case-status{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.case-item .saved-indicator{
+  font-size:14px;
+  margin-left:8px;
+}
+
+.no-cases-msg{
+  text-align:center;
+  color:var(--muted);
+  padding:20px;
+}
+
+.no-cases-msg a{
+  color:var(--accent);
+}
+
+/* Game screen */
+.game-screen{
+  width:100%;
+  padding:20px;
+}
+
+.game-screen.hidden{
+  display:none;
+}
+
+.game-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.back-btn, .save-btn{
+  background:var(--card);
+  border:1px solid rgba(0,0,0,0.1);
+  padding:8px 16px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:14px;
+  transition:all 0.2s ease;
+}
+
+.back-btn:hover, .save-btn:hover{
+  border-color:var(--accent);
+}
+
+.save-btn{
+  background:linear-gradient(180deg,#4caf50, #388e3c);
+  color:#fff;
+  border:none;
+}
+
+.case-panel{
+  background:var(--card);
+  padding:20px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  margin-bottom:20px;
+}
+
+.case-panel .case-title{
+  font-family:"Special Elite", monospace;
+  color:var(--accent);
+  margin:0 0 12px 0;
+}
+
+.case-summary{
+  color:#444;
+  line-height:1.5;
+}
+
+.victim-info, .timeline-section, .clues-section{
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px dashed rgba(0,0,0,0.1);
+}
+
+.victim-info h4, .timeline-section h4, .clues-section h4{
+  margin:0 0 8px 0;
+  color:var(--muted);
+  font-size:14px;
+  text-transform:uppercase;
+}
+
+.suspects-panel{
+  background:var(--card);
+  padding:20px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  margin-bottom:20px;
+}
+
+.suspects-panel h3{
+  margin:0 0 16px 0;
+  color:var(--muted);
+}
+
+.suspects-list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.suspect-card{
+  background:rgba(0,0,0,0.02);
+  padding:14px;
+  border-radius:6px;
+  border-left:4px solid var(--accent);
+}
+
+.suspect-card h4{
+  margin:0 0 6px 0;
+  color:#2b2b2b;
+}
+
+.suspect-card p{
+  margin:4px 0;
+  font-size:14px;
+  color:#555;
+}
+
+.suspect-card .alibi{
+  font-style:italic;
+  color:var(--muted);
+}
+
+.accusation-section{
+  margin-top:20px;
+  padding-top:16px;
+  border-top:1px dashed rgba(0,0,0,0.1);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.accusation-section label{
+  font-weight:500;
+}
+
+#suspect-select{
+  padding:8px 12px;
+  border-radius:6px;
+  border:1px solid rgba(0,0,0,0.15);
+  font-size:14px;
+  min-width:200px;
+}
+
+.accuse-btn{
+  background:linear-gradient(180deg,var(--accent), #8a0000);
+  color:#fff;
+  padding:10px 20px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.notes-panel{
+  background:var(--card);
+  padding:20px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  margin-bottom:20px;
+}
+
+.notes-panel h4{
+  margin:0 0 12px 0;
+  color:var(--muted);
+}
+
+#player-notes{
+  width:100%;
+  min-height:100px;
+  padding:12px;
+  border:1px solid rgba(0,0,0,0.1);
+  border-radius:6px;
+  font-family:inherit;
+  font-size:14px;
+  resize:vertical;
+}
+
+.close-case-btn{
+  display:block;
+  width:100%;
+  background:linear-gradient(180deg,#4caf50, #388e3c);
+  color:#fff;
+  padding:14px 28px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:16px;
+  font-weight:600;
+  box-shadow:0 4px 12px rgba(76,175,80,0.3);
+}
+
+.close-case-btn:hover{
+  opacity:0.9;
+}
+
+.start-screen.hidden{
+  display:none;
+}
+
+/* Toast notification */
+#toast{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#333;
+  color:#fff;
+  padding:12px 24px;
+  border-radius:6px;
+  z-index:1000;
+  opacity:0;
+  transition:opacity 0.3s;
+}
