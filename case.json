@@ -1,0 +1,8 @@
+{
+  "victim": {"name": "", "age": "", "img": ""},
+  "location": "",
+  "weapon": "",
+  "motive": "",
+  "suspects": [],
+  "clues": []
+}
