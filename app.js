@@ -86,13 +86,20 @@
     return null;
   }
   
+  // HTML escape helper to prevent XSS
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text || '';
+    return div.innerHTML;
+  }
+  
   // Show a temporary toast message
   function showToast(message) {
     let toast = document.getElementById('toast');
     if (!toast) {
       toast = document.createElement('div');
       toast.id = 'toast';
-      toast.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 24px;border-radius:6px;z-index:1000;opacity:0;transition:opacity 0.3s;';
+      // Styles defined in styles.css
       document.body.appendChild(toast);
     }
     toast.textContent = message;
@@ -100,15 +107,18 @@
     setTimeout(() => { toast.style.opacity = '0'; }, 2000);
   }
   
+  // Template file constant
+  const TEMPLATE_FILE_PATH = '/cases/case-template.json';
+  
   // Fetch cases from /cases/*.json or fallback to /case.json
+  // Note: Browser cannot enumerate directory contents, so we check known paths
   async function fetchCases() {
     const loadedCases = [];
     
-    // Try to fetch from /cases/case-template.json first to see if /cases/ exists
-    // Then try to load known case files or fallback to /case.json
+    // Known case file paths to check
+    // Add additional case paths here or rely on localStorage for discovered cases
     const casePaths = [
-      '/case.json',
-      '/cases/case-template.json'
+      '/case.json'
     ];
     
     for (const path of casePaths) {
@@ -119,7 +129,7 @@
           const caseId = caseData.id || caseData.case_id || path;
           
           // Skip template file from active cases
-          if (path.includes('case-template.json')) continue;
+          if (path === TEMPLATE_FILE_PATH) continue;
           
           // Check if case already exists in state
           const existingCase = appState.cases.find(c => 
@@ -216,11 +226,13 @@
     listEl.innerHTML = filteredCases.map(c => {
       const caseId = c.id || c.case_id;
       const hasSavedProgress = !!loadGameProgress(caseId);
-      const savedClass = hasSavedProgress ? 'saved' : '';
+      const savedIndicator = hasSavedProgress 
+        ? '<span class="saved-indicator" aria-label="Progress saved" title="Progress saved">💾</span>' 
+        : '';
       return `
-        <div class="case-item ${savedClass}" data-case-id="${caseId}">
-          <span class="case-title">${c.title || 'Untitled Case'}</span>
-          <span class="case-status">${c.status === 'closed' ? '✓ Solved' : 'Open'}</span>
+        <div class="case-item" data-case-id="${escapeHtml(caseId)}">
+          <span class="case-title">${escapeHtml(c.title) || 'Untitled Case'}</span>
+          <span class="case-status">${c.status === 'closed' ? '✓ Solved' : 'Open'}${savedIndicator}</span>
         </div>
       `;
     }).join('');
@@ -259,9 +271,9 @@
     if (caseData.victim) {
       victimEl.innerHTML = `
         <h4>Victim</h4>
-        <p><strong>${caseData.victim.name || 'Unknown'}</strong></p>
-        <p>Age: ${caseData.victim.age || 'Unknown'} | Occupation: ${caseData.victim.occupation || 'Unknown'}</p>
-        <p>Last seen: ${caseData.victim.last_known_location || 'Unknown'}</p>
+        <p><strong>${escapeHtml(caseData.victim.name) || 'Unknown'}</strong></p>
+        <p>Age: ${escapeHtml(String(caseData.victim.age)) || 'Unknown'} | Occupation: ${escapeHtml(caseData.victim.occupation) || 'Unknown'}</p>
+        <p>Last seen: ${escapeHtml(caseData.victim.last_known_location) || 'Unknown'}</p>
       `;
     } else {
       victimEl.innerHTML = '';
@@ -273,7 +285,7 @@
       timelineEl.innerHTML = `
         <h4>Timeline</h4>
         <ul>
-          ${caseData.timeline.map(t => `<li><strong>${t.time}</strong>: ${t.event}</li>`).join('')}
+          ${caseData.timeline.map(t => `<li><strong>${escapeHtml(t.time)}</strong>: ${escapeHtml(t.event)}</li>`).join('')}
         </ul>
       `;
     } else {
@@ -287,7 +299,7 @@
       cluesEl.innerHTML = `
         <h4>Initial Clues</h4>
         <ul>
-          ${clues.map(c => `<li>${typeof c === 'string' ? c : c.description || c}</li>`).join('')}
+          ${clues.map(c => `<li>${escapeHtml(typeof c === 'string' ? c : c.description || String(c))}</li>`).join('')}
         </ul>
       `;
     } else {
@@ -301,16 +313,16 @@
     
     suspectsListEl.innerHTML = suspects.map(s => `
       <div class="suspect-card">
-        <h4>${s.name || 'Unknown'}</h4>
-        <p><strong>Relationship:</strong> ${s.relationship_to_victim || 'Unknown'}</p>
-        <p>${s.notes || ''}</p>
-        <p class="alibi"><strong>Alibi:</strong> ${s.alibi || 'None provided'}</p>
+        <h4>${escapeHtml(s.name) || 'Unknown'}</h4>
+        <p><strong>Relationship:</strong> ${escapeHtml(s.relationship_to_victim) || 'Unknown'}</p>
+        <p>${escapeHtml(s.notes) || ''}</p>
+        <p class="alibi"><strong>Alibi:</strong> ${escapeHtml(s.alibi) || 'None provided'}</p>
       </div>
     `).join('');
     
     // Populate suspect dropdown
     suspectSelect.innerHTML = '<option value="">Select a suspect...</option>' +
-      suspects.map(s => `<option value="${s.id || s.name}">${s.name}</option>`).join('');
+      suspects.map(s => `<option value="${escapeHtml(s.id || s.name)}">${escapeHtml(s.name)}</option>`).join('');
     
     // Load saved progress if exists
     const savedProgress = loadGameProgress(caseId);

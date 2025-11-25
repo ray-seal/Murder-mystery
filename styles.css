@@ -156,8 +156,7 @@ body{
   color:var(--muted);
 }
 
-.case-item.saved::after{
-  content:'💾';
+.case-item .saved-indicator{
   font-size:14px;
   margin-left:8px;
 }
